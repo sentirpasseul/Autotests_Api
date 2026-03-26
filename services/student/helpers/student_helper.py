@@ -1,0 +1,33 @@
+import requests
+
+from services.general.helpers.base_helper import BaseHelper
+from services.general.models.general_response import GeneralResponse
+from services.student.models.student_request import StudentsRequest
+from services.student.models.student_response import StudentsResponse
+from services.student.models.student import Student
+
+
+class StudentHelper(BaseHelper):
+    ENDPOINT_PREFIX = "/students"
+    STUDENT_ID_ENDPOINT = ENDPOINT_PREFIX+"/{student_id}"
+
+
+    def get_students(self) -> requests.Response:
+        response = self.api_utils.get(self.ENDPOINT_PREFIX)
+        return response
+
+    def post_student(self, json: dict) -> requests.Response:
+        response = self.api_utils.post(self.ENDPOINT_PREFIX, json=json)
+        return response
+
+    def delete_student(self, json: dict) -> requests.Response:
+        response = self.api_utils.delete(self.STUDENT_ID_ENDPOINT, json=json)
+        return response
+
+    def get_student_by_id(self, params: dict) -> requests.Response:
+        response = self.api_utils.get(self.STUDENT_ID_ENDPOINT, params)
+        return response
+
+    def put_student_by_id(self, params: dict) -> requests.Response:
+        response = self.api_utils.put(self.STUDENT_ID_ENDPOINT, params)
+        return response
