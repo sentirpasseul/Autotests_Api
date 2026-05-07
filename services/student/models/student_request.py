@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class StudentsRequest(BaseModel):
+class StudentRequest(BaseModel):
     first_name: str
     last_name: str
     email: str

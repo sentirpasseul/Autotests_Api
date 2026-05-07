@@ -2,8 +2,8 @@ import requests
 
 from services.general.helpers.base_helper import BaseHelper
 from services.general.models.general_response import GeneralResponse
-from services.student.models.student_request import StudentsRequest
-from services.student.models.student_response import StudentsResponse
+from services.student.models.student_request import StudentRequest
+from services.student.models.student_response import StudentResponse
 from services.student.models.student import Student
 
 
@@ -20,14 +20,14 @@ class StudentHelper(BaseHelper):
         response = self.api_utils.post(self.ENDPOINT_PREFIX, json=json)
         return response
 
-    def delete_student(self, json: dict) -> requests.Response:
-        response = self.api_utils.delete(self.STUDENT_ID_ENDPOINT, json=json)
+    def delete_student(self, student_id: int) -> requests.Response:
+        response = self.api_utils.delete(self.STUDENT_ID_ENDPOINT.format(student_id=student_id))
         return response
 
-    def get_student_by_id(self, params: dict) -> requests.Response:
-        response = self.api_utils.get(self.STUDENT_ID_ENDPOINT, params)
+    def get_student_by_id(self, student_id: int) -> requests.Response:
+        response = self.api_utils.get(self.STUDENT_ID_ENDPOINT.format(student_id=student_id))
         return response
 
-    def put_student_by_id(self, params: dict) -> requests.Response:
-        response = self.api_utils.put(self.STUDENT_ID_ENDPOINT, params)
+    def put_student_by_id(self, student_id: int, json: dict, params: dict = None) -> requests.Response:
+        response = self.api_utils.put(self.STUDENT_ID_ENDPOINT.format(student_id=student_id), params=params, json=json)
         return response

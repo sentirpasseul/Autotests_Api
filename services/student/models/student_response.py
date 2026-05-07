@@ -1,5 +1,5 @@
-from services.student.models.student_request import StudentsRequest
+from services.student.models.student_request import StudentRequest
 
 
-class StudentsResponse(StudentsRequest):
+class StudentResponse(StudentRequest):
     id: int

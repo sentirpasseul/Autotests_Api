@@ -34,15 +34,15 @@ class ApiUtils:
 
     @log_response
     def post(self, endpoint_url, data=None, json=None, **kwargs):
-        response = self.session.post(self.url + endpoint_url, data, json, **kwargs)
+        response = self.session.post(self.url + endpoint_url, data=data, json=json, **kwargs)
         return response
 
     @log_response
     def delete(self, endpoint_url, params=None, data=None, **kwargs):
-        response = self.session.delete(endpoint_url, params=params, data=data, **kwargs)
+        response = self.session.delete(self.url + endpoint_url, params=params, data=data, **kwargs)
         return response
 
     @log_response
-    def put(self, endpoint_url, params=None, data=None, **kwargs):
-        response = self.session.put(endpoint_url, params=params, data=data, **kwargs)
+    def put(self, endpoint_url, params=None, json=None, **kwargs):
+        response = self.session.put(self.url + endpoint_url, params=params, json=json, **kwargs)
         return response
