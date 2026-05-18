@@ -1,4 +1,4 @@
-from utils.assertions import StudentAssertions
+from utils.assertions.student_assertions import StudentAssertions
 
 
 class TestStudent:
