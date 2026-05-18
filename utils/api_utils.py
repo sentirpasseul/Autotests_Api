@@ -19,13 +19,17 @@ def log_response(func):
     return _log_response
 
 class ApiUtils:
-    def __init__(self, url, headers = None):
+    def __init__(self, url, headers = None, token: str = None):
         if headers is None:
             headers = {}
+
 
         self.session = Session()
         self.session.headers.update(headers)
         self.url = url
+
+        if token:
+            self.session.headers.update({"Authorization": f"Bearer {token}"})
 
     @log_response
     def get(self, endpoint_url, **kwargs):
@@ -43,6 +47,6 @@ class ApiUtils:
         return response
 
     @log_response
-    def put(self, endpoint_url, params=None, json=None, **kwargs):
-        response = self.session.put(self.url + endpoint_url, params=params, json=json, **kwargs)
+    def put(self, endpoint_url, json=None, **kwargs):
+        response = self.session.put(self.url + endpoint_url, json=json, **kwargs)
         return response
