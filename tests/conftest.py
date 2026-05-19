@@ -8,8 +8,10 @@ from services.authorization.models.login_request import LoginRequest
 from services.authorization.models.register_request import RegisterRequest
 from services.authorization.user.models.user import UserResponse
 from services.university.grade.helpers.grade_helper import GradeHelper
+from services.university.grade.models.grade import GradeRequest
 from services.university.group.helpers.group_helper import GroupHelper
 from services.university.group.models.group_request import GroupRequest
+from services.university.group.models.subjects import Subjects
 from services.university.student.helpers.student_helper import StudentHelper
 from services.university.student.models.student import DegreeEnum
 from services.university.student.models.student_request import StudentRequest
@@ -53,6 +55,12 @@ def university_api_utils_anonym(access_token):
 def university_service(university_api_utils_anonym):
     university_service = UniversityService(university_api_utils_anonym)
     return university_service
+
+
+@pytest.fixture(scope="function", autouse=False)
+def auth_service(auth_api_utils_anonym):
+    auth_service = AuthorizationService(auth_api_utils_anonym)
+    return auth_service
 
 
 @pytest.fixture(scope="function", autouse=False)
@@ -113,9 +121,8 @@ def get_user_by_token(auth_api_utils, access_token):
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_user_id(generate_random_user, auth_helper):
-    user = generate_random_user
-    user_id = auth_helper.post_register(user.model_dump()).json()['id']
+def get_user_id(generate_random_user, auth_api_utils_anonym, auth_service):
+    user_id = auth_service.register_user(generate_random_user).id
     return user_id
 
 
@@ -123,25 +130,23 @@ def get_user_id(generate_random_user, auth_helper):
 def generate_random_group(university_service):
     group = GroupRequest(name=faker.bothify("???-##-#"))
     Logger.info(f"Generated group: {group}")
-    group_response = university_service.create_group(group_request=group)
-    return group_response
+    return group
 
 
 @pytest.fixture(scope="function", autouse=False)
-def generate_random_student(university_service, generate_random_group):
+def generate_random_student(university_service, get_group_id):
     student = StudentRequest(first_name=faker.first_name(),
                              last_name=faker.last_name(),
                              email=faker.email(),
                              degree=random.choice([option for option in DegreeEnum]),
-                             phone=faker.numerify("+7##########"), group_id=generate_random_group.id)
+                             phone=faker.numerify("+7##########"), group_id=get_group_id)
     Logger.info(f"Generated student: {student}")
     return student
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_student_id(university_api_utils_anonym, generate_random_student, student_helper):
-    student = generate_random_student
-    student_id = student_helper.post_student(student.model_dump()).json()['id']
+def get_student_id(university_api_utils_anonym, generate_random_student, university_service):
+    student_id = university_service.create_student(generate_random_student).id
     return student_id
 
 
@@ -150,21 +155,41 @@ def generate_random_teacher(university_api_utils_anonym):
     teacher = {
         "first_name": faker.first_name(),
         "last_name": faker.last_name(),
-        "subject": faker.job()
+        "subject": random.choice(list(Subjects.values()))
     }
     Logger.info(f"Generated teacher: {teacher}")
     return TeacherRequest(**teacher)
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_group_id(university_api_utils_anonym, generate_random_group, group_helper):
-    group = generate_random_group
-    group_id = group_helper.get_group_by_id(group.id)
+def generate_random_grade(university_api_utils_anonym, get_teacher_id, get_student_id, get_random_grade):
+    grade = {
+        "teacher_id": get_teacher_id,
+        "student_id": get_student_id,
+        "grade": get_random_grade
+    }
+    Logger.info(f"Generated grade: {grade}")
+    return GradeRequest(**grade)
+
+
+@pytest.fixture(scope="function", autouse=False)
+def get_group_id(university_api_utils_anonym, generate_random_group, university_service):
+    group_id = university_service.create_group(generate_random_group).id
     return group_id
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_teacher_id(university_api_utils_anonym, generate_random_teacher, teacher_helper):
-    teacher = generate_random_teacher
-    teacher_id = teacher_helper.post_teacher(teacher.model_dump()).json()['id']
+def get_teacher_id(university_api_utils_anonym, generate_random_teacher, university_service):
+    teacher_id = university_service.create_teacher(generate_random_teacher).id
     return teacher_id
+
+
+@pytest.fixture(scope="function", autouse=False)
+def get_random_grade():
+    return random.randint(0, 5)
+
+
+@pytest.fixture(scope="function", autouse=False)
+def get_grade_id(university_api_utils_anonym, university_service, generate_random_grade):
+    grade_id = university_service.create_grade(generate_random_grade).id
+    return grade_id
