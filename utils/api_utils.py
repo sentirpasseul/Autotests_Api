@@ -16,13 +16,14 @@ def log_response(func):
         Logger.info(f"Response status code = '{response.status_code}'"
                     f"\n {body} \n")
         return response
+
     return _log_response
 
+
 class ApiUtils:
-    def __init__(self, url, headers = None, token: str = None):
+    def __init__(self, url, headers=None, token: str = None):
         if headers is None:
             headers = {}
-
 
         self.session = Session()
         self.session.headers.update(headers)

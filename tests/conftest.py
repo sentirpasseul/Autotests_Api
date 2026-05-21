@@ -6,6 +6,7 @@ from services.authorization.authorization_service import AuthorizationService
 from services.authorization.helpers.authorization_helper import AuthorizationHelper
 from services.authorization.models.login_request import LoginRequest
 from services.authorization.models.register_request import RegisterRequest
+from services.authorization.user.helpers.user_helper import UserHelper
 from services.authorization.user.models.user import UserResponse
 from services.university.grade.helpers.grade_helper import GradeHelper
 from services.university.grade.models.grade import GradeRequest
@@ -21,6 +22,7 @@ from services.university.university_service import UniversityService
 from utils.api_utils import ApiUtils
 from faker import Faker
 
+from utils.factories.factory_random_data import FactoryRandomData
 from utils.logs.logger.logger import Logger
 
 faker = Faker()
@@ -33,6 +35,24 @@ def auth_api_utils_anonym():
 
 
 @pytest.fixture(scope="function", autouse=False)
+def student_api_utils_anonym():
+    api_utils = ApiUtils(url=UniversityService.SERVICE_URL)
+    return api_utils
+
+
+@pytest.fixture(scope="function", autouse=False)
+def student_api_utils_fake_token():
+    token = FactoryRandomData.generate_jwt_token()
+    api_utils = ApiUtils(url=UniversityService.SERVICE_URL, token=token)
+    return api_utils
+
+
+@pytest.fixture(scope="function", autouse=False)
+def student_helper_fake_token(student_api_utils_fake_token):
+    return StudentHelper(api_utils=student_api_utils_fake_token)
+
+
+@pytest.fixture(scope="function", autouse=False)
 def auth_api_utils(access_token):
     api_utils = ApiUtils(url=AuthorizationService.SERVICE_URL,
                          token=access_token)
@@ -42,6 +62,11 @@ def auth_api_utils(access_token):
 @pytest.fixture(scope="function", autouse=False)
 def auth_helper(auth_api_utils_anonym):
     return AuthorizationHelper(api_utils=auth_api_utils_anonym)
+
+
+@pytest.fixture(scope="function", autouse=False)
+def user_helper(auth_api_utils_anonym):
+    return UserHelper(api_utils=auth_api_utils_anonym)
 
 
 @pytest.fixture(scope="function", autouse=False)
@@ -84,28 +109,24 @@ def group_helper(university_api_utils_anonym):
 
 
 @pytest.fixture(scope="function", autouse=False)
-def access_token(auth_api_utils_anonym, generate_random_user):
-    auth_service = AuthorizationService(auth_api_utils_anonym)
-    random_user = generate_random_user
-    auth_service.register_user(register_request=random_user)
-    login_response = auth_service.login_user(login_request=LoginRequest(username=random_user.username,
-                                                                        password=random_user.password))
+def access_token(auth_api_utils_anonym, generate_random_user, auth_service):
+    auth_service.register_user(register_request=generate_random_user)
+    login_response = auth_service.login_user(login_request=
+    LoginRequest(
+        username=generate_random_user.username,
+        password=generate_random_user.password))
     return login_response.access_token
 
 
 @pytest.fixture(scope="function", autouse=False)
 def generate_random_user(auth_api_utils_anonym):
     username = faker.user_name()
-    password_username = faker.password(length=30,
-                                       special_chars=True,
-                                       digits=True,
-                                       upper_case=True,
-                                       lower_case=True)
+    password = FactoryRandomData.generate_random_password()
     email = faker.email()
     user_data = {
         "username": username,
-        "password": password_username,
-        "password_repeat": password_username,
+        "password": password,
+        "password_repeat": password,
         "email": email
     }
     log_data = user_data.copy()
