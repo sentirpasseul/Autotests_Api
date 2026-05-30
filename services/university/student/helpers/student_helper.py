@@ -5,7 +5,7 @@ from services.general.helpers.base_helper import BaseHelper
 
 class StudentHelper(BaseHelper):
     ENDPOINT_PREFIX = "/students"
-    STUDENT_ID_ENDPOINT = ENDPOINT_PREFIX + "/{student_id}"
+    STUDENT_ID_ENDPOINT = f"{ENDPOINT_PREFIX}/{{student_id}}"
 
     def get_students(self) -> requests.Response:
         response = self.api_utils.get(self.ENDPOINT_PREFIX)

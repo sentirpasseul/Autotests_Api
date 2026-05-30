@@ -4,8 +4,8 @@ import requests
 
 class GradeHelper(BaseHelper):
     ENDPOINT_PREFIX = "/grades"
-    GRADE_ID = ENDPOINT_PREFIX + "/{grade_id}"
-    STATS = ENDPOINT_PREFIX + "/stats"
+    GRADE_ID = f"{ENDPOINT_PREFIX}/{{grade_id}}"
+    STATS = f"{ENDPOINT_PREFIX}/stats"
 
     def post_grade(self, data: dict) -> requests.Response:
         response = self.api_utils.post(self.ENDPOINT_PREFIX, data=data)

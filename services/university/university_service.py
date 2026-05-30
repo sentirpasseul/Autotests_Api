@@ -1,5 +1,5 @@
-from http.client import responses
-
+from services.general.models.error_response import ValidationError, ErrorResponse
+from services.general.models.success_response import SuccessResponse
 from services.general.base_service import BaseService
 from services.university.grade.helpers.grade_helper import GradeHelper
 from services.university.grade.models.grade import GradeResponse, GradeRequest
@@ -13,6 +13,7 @@ from services.university.teacher.helpers.teacher_helper import TeacherHelper
 from services.university.teacher.models.teacher_request import TeacherRequest
 from services.university.teacher.models.teacher_response import TeacherResponse
 from utils.api_utils import ApiUtils
+from utils.responses.handlers import handle_response_university
 
 
 class UniversityService(BaseService):
@@ -25,6 +26,7 @@ class UniversityService(BaseService):
         self.student_helper = StudentHelper(self.api_utils)
         self.teacher_helper = TeacherHelper(self.api_utils)
         self.grade_helper = GradeHelper(self.api_utils)
+
 
     def create_group(self, group_request: GroupRequest) -> GroupResponse:
         response = self.group_helper.post_group(json=group_request.model_dump())
@@ -45,3 +47,8 @@ class UniversityService(BaseService):
     def get_student(self, student_id: int):
         response = self.student_helper.get_student_by_id(student_id)
         return StudentResponse(**response.json())
+
+    @handle_response_university
+    def delete_student(self, student_id: int):
+        response = self.student_helper.delete_student(student_id)
+        return response

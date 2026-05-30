@@ -7,8 +7,7 @@ from services.general.helpers.base_helper import BaseHelper
 
 class GroupHelper(BaseHelper):
     ENDPOINT_PREFIX = "/groups"
-    GROUP_ID = ENDPOINT_PREFIX + "/{group_id}/"
-
+    GROUP_ID = f"{ENDPOINT_PREFIX}/{{group_id}}"
 
     def post_group(self, json: dict) -> requests.Response:
         response = self.api_utils.post(self.ENDPOINT_PREFIX, json=json)

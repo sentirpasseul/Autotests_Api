@@ -1,9 +1,10 @@
 from services.general.helpers.base_helper import BaseHelper
 import requests
 
+
 class TeacherHelper(BaseHelper):
     ENDPOINT_PREFIX = "/teachers"
-    TEACHER_ID = ENDPOINT_PREFIX + "/{teacher_id}/"
+    TEACHER_ID = f"{ENDPOINT_PREFIX}/{{teacher_id}}"
 
     def get_teachers(self) -> requests.Response:
         response = self.api_utils.get(self.ENDPOINT_PREFIX)

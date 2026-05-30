@@ -1,7 +1,9 @@
-Subjects = {
-    0: "Mathematics",
-    1: "Physics",
-    2: "History",
-    3: "Biology",
-    4: "Geography"
-}
+from enum import StrEnum
+
+
+class Subjects(StrEnum):
+    MATH = "Mathematics"
+    PHYSICS = "Physics"
+    HISTORY = "History"
+    BIOLOGY = "Biology"
+    GEOGRAPHY = "Geography"

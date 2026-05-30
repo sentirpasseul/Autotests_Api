@@ -1,15 +1,16 @@
 import requests
 
 from utils.assertions.general_assertions import Assertions
+from utils.factories.factory_random_data import FactoryRandomData
 
 
 class TestGrade:
 
-    def test_create_grade(self, grade_helper, get_student_id, get_teacher_id, get_random_grade):
+    def test_create_grade(self, grade_helper, get_student_id, get_teacher_id):
         response = grade_helper.post_grade(data={
             "teacher_id": get_teacher_id,
             "student_id": get_student_id,
-            "grade": get_random_grade
+            "grade": FactoryRandomData().get_random_grade()
         })
         Assertions.validate_response_status_code(response, requests.codes.created)
 
@@ -35,7 +36,7 @@ class TestGrade:
 
     def test_get_stat(self, grade_helper, get_student_id, get_group_id, get_teacher_id):
         response = grade_helper.get_grades_stat(data={
-                "group_id": get_group_id,
-                "student_id": get_student_id,
-                "teacher_id": get_teacher_id})
+            "group_id": get_group_id,
+            "student_id": get_student_id,
+            "teacher_id": get_teacher_id})
         Assertions.validate_response_status_code(response, requests.codes.ok)

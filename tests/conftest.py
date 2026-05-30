@@ -21,6 +21,8 @@ from services.university.teacher.models.teacher_request import TeacherRequest
 from services.university.university_service import UniversityService
 from utils.api_utils import ApiUtils
 from faker import Faker
+from services.university.grade.models.grade import Grade
+from utils.assertions.soft_assert import SoftAssert
 
 from utils.factories.factory_random_data import FactoryRandomData
 from utils.logs.logger.logger import Logger
@@ -176,18 +178,18 @@ def generate_random_teacher(university_api_utils_anonym):
     teacher = {
         "first_name": faker.first_name(),
         "last_name": faker.last_name(),
-        "subject": random.choice(list(Subjects.values()))
+        "subject": random.choice(list(Subjects))
     }
     Logger.info(f"Generated teacher: {teacher}")
     return TeacherRequest(**teacher)
 
 
 @pytest.fixture(scope="function", autouse=False)
-def generate_random_grade(university_api_utils_anonym, get_teacher_id, get_student_id, get_random_grade):
+def generate_random_grade(university_api_utils_anonym, get_teacher_id, get_student_id):
     grade = {
         "teacher_id": get_teacher_id,
         "student_id": get_student_id,
-        "grade": get_random_grade
+        "grade": FactoryRandomData.get_random_grade()
     }
     Logger.info(f"Generated grade: {grade}")
     return GradeRequest(**grade)
@@ -206,11 +208,12 @@ def get_teacher_id(university_api_utils_anonym, generate_random_teacher, univers
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_random_grade():
-    return random.randint(0, 5)
-
-
-@pytest.fixture(scope="function", autouse=False)
 def get_grade_id(university_api_utils_anonym, university_service, generate_random_grade):
     grade_id = university_service.create_grade(generate_random_grade).id
     return grade_id
+
+@pytest.fixture(scope="function", autouse=False)
+def soft_assert():
+    sa = SoftAssert()
+    yield sa
+    sa.assert_all()

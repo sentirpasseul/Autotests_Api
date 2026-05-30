@@ -5,7 +5,7 @@ from services.university.student.models.student_response import StudentResponse
 class StudentAssertions:
 
     @staticmethod
-    def check_student_data(actual: StudentRequest, expected: StudentResponse):
+    def check_student_data_response(actual: StudentRequest, expected: StudentResponse):
         assert actual.first_name == expected.first_name, \
             f"First name mismatch: got {actual.first_name}, expected {expected.first_name}"
         assert actual.last_name == expected.last_name, \
@@ -18,3 +18,5 @@ class StudentAssertions:
             f"Phone mismatch: got {actual.phone}, expected {expected.phone}"
         assert actual.group_id == expected.group_id, \
             f"Group id mismatch: got {actual.group_id}, expected {expected.group_id}"
+        assert actual.id == expected.id, \
+            f"Student id mismatch: got {actual.id}, expected {expected.id}"

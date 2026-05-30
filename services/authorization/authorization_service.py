@@ -2,12 +2,13 @@ from services.authorization.helpers.authorization_helper import AuthorizationHel
 from services.authorization.models.login_request import LoginRequest
 from services.authorization.models.login_response import LoginResponse
 from services.authorization.models.register_request import RegisterRequest
-from services.authorization.models.success_response import SuccessResponse
+from services.general.models.success_response import SuccessResponse
 from services.authorization.user.helpers.user_helper import UserHelper
 from services.authorization.user.models.user import UserResponse
 from services.general.base_service import BaseService
 from services.general.models.error_response import ErrorResponse, ValidationError
 from utils.api_utils import ApiUtils
+import requests
 
 
 class AuthorizationService(BaseService):
@@ -21,15 +22,6 @@ class AuthorizationService(BaseService):
 
     def register_user(self, register_request: RegisterRequest):
         response = self.authorization_helpers.post_register(data=register_request.model_dump())
-        if response == 201:
-            return SuccessResponse(**response.json())
-        if response == 409:
-            return ErrorResponse(**response.json())
-        if response == 422:
-            return ValidationError(**response.json())
-
-
-
         return response
 
     def login_user(self, login_request: LoginRequest) -> LoginResponse:
