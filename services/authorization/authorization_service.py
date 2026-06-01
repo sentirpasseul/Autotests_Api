@@ -22,12 +22,28 @@ class AuthorizationService(BaseService):
 
     def register_user(self, register_request: RegisterRequest):
         response = self.authorization_helpers.post_register(data=register_request.model_dump())
-        return response
+        if response.status_code == requests.codes.created:
+            return SuccessResponse(**response.json())
+        if response.status_code != requests.codes.unprocessable:
+            return ErrorResponse(**response.json())
+        else:
+            return ValidationError(**response.json())
 
-    def login_user(self, login_request: LoginRequest) -> LoginResponse:
+    def login_user(self, login_request: LoginRequest):
         response = self.authorization_helpers.post_login(data=login_request.model_dump())
-        return LoginResponse(**response.json())
+        if response.status_code == requests.codes.ok:
+            return LoginResponse(**response.json())
+        if response.status_code != requests.codes.unprocessable:
+            return ErrorResponse(**response.json())
+        else:
+            return ValidationError(**response.json())
 
-    def get_user_by_token(self) -> UserResponse:
+    def get_user_by_token(self):
         response = self.user_helper.get_me()
-        return UserResponse(**response.json())
+        if response.status_code == requests.codes.created:
+            return UserResponse(**response.json())
+        if response.status_code != requests.codes.unprocessable:
+            return ErrorResponse(**response.json())
+        else:
+            return ValidationError(**response.json())
+

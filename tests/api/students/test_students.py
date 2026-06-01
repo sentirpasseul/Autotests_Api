@@ -1,9 +1,8 @@
 import requests.status_codes
 
-from conftest import student_helper
+from conftest import student_helper, generate_random_student
 from services.university.student.helpers.student_helper import StudentHelper
 from utils.assertions.general_assertions import Assertions
-from utils.assertions.student_assertions import StudentAssertions
 from utils.responses.student_responses import StudentResponse
 
 
@@ -12,8 +11,8 @@ class TestStudents:
         response = student_helper.get_students()
         Assertions.validate_response_status_code(response, requests.codes.ok)
 
-    def test_get_students_correct_response(self, university_service, generate_random_student, soft_assert):
-        student = university_service.create_student(generate_random_student)
+    def test_get_students_correct_response(self, university_service, soft_assert, get_group_id):
+        student = university_service.create_student(generate_random_student(get_group_id))
         response = university_service.get_student(student.id)
         soft_assert.check(response.first_name == student.first_name,
                           message=f"First name mismatch: got {response.first_name}, expected {student.first_name}")
@@ -40,39 +39,41 @@ class TestStudents:
         response = student_helper.get_students()
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
-    def test_create_student(self, student_helper, generate_random_student):
-        response = student_helper.post_student(generate_random_student.model_dump())
+    def test_create_student(self, student_helper, get_group_id):
+        student = generate_random_student(get_group_id)
+        response = student_helper.post_student(student.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.created)
 
-    def test_create_student_with_fake_token(self, student_helper_fake_token, generate_random_student):
-        response = student_helper_fake_token.post_student(generate_random_student.model_dump())
+    def test_create_student_with_fake_token(self, student_helper_fake_token, get_group_id):
+        response = student_helper_fake_token.post_student(generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
-    def test_create_student_without_creds(self, student_api_utils_anonym, generate_random_student):
+    def test_create_student_without_creds(self, student_api_utils_anonym, get_group_id):
         student_helper = StudentHelper(api_utils=student_api_utils_anonym)
-        response = student_helper.post_student(generate_random_student.model_dump())
+        response = student_helper.post_student(generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
-    def test_create_student_check_response(self, generate_random_student, university_service, soft_assert):
-        response = university_service.create_student(generate_random_student)
-        soft_assert.check(response.first_name == generate_random_student.first_name,
+    def test_create_student_check_response(self, get_group_id, university_service, soft_assert):
+        student = generate_random_student(get_group_id)
+        response = university_service.create_student(student)
+        soft_assert.check(response.first_name == student.first_name,
                           message=f"First name mismatch: got {response.first_name}, "
-                                  f"expected {generate_random_student.first_name}")
-        soft_assert.check(response.last_name == generate_random_student.last_name,
+                                  f"expected {student.first_name}")
+        soft_assert.check(response.last_name == student.last_name,
                           message=f"Last name mismatch: got {response.last_name}, "
-                                  f"expected {generate_random_student.last_name}")
-        soft_assert.check(response.email == generate_random_student.email,
+                                  f"expected {student.last_name}")
+        soft_assert.check(response.email == student.email,
                           message=f"Email mismatch: got {response.email}, "
-                                  f"expected {generate_random_student.email}")
-        soft_assert.check(response.degree == generate_random_student.degree,
+                                  f"expected {student.email}")
+        soft_assert.check(response.degree == student.degree,
                           message=f"Degree mismatch: got {response.degree}, "
-                                  f"expected {generate_random_student.degree}")
-        soft_assert.check(response.phone == generate_random_student.phone,
+                                  f"expected {student.degree}")
+        soft_assert.check(response.phone == student.phone,
                           message=f"Phone mismatch: got {response.phone}, "
-                                  f"expected {generate_random_student.phone}")
-        soft_assert.check(response.group_id == generate_random_student.group_id,
+                                  f"expected {student.phone}")
+        soft_assert.check(response.group_id == student.group_id,
                           message=f"Group id mismatch: got {response.group_id}, "
-                                  f"expected {generate_random_student.group_id}")
+                                  f"expected {student.group_id}")
         soft_assert.assert_all()
 
     def test_delete_student_status_code(self, student_helper, get_student_id):
@@ -105,19 +106,19 @@ class TestStudents:
         response = student_helper.get_student_by_id(get_student_id)
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
-    def test_put_student_by_id(self, student_helper, get_student_id, generate_random_student):
+    def test_put_student_by_id(self, student_helper, get_student_id, get_group_id):
         response = student_helper.put_student_by_id(student_id=get_student_id,
-                                                    json=generate_random_student.model_dump())
+                                                    json=generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.ok)
 
-    def test_put_student_with_fake_token(self, student_helper_fake_token, get_student_id, generate_random_student):
+    def test_put_student_with_fake_token(self, student_helper_fake_token, get_student_id, get_group_id):
         response = student_helper_fake_token.put_student_by_id(student_id=get_student_id,
-                                                               json=generate_random_student.model_dump())
+                                                               json=generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
     def test_put_student_by_id_without_creds(self, student_api_utils_anonym, student_helper, get_student_id,
-                                             generate_random_student):
+                                             get_group_id):
         student_helper = StudentHelper(api_utils=student_api_utils_anonym)
         response = student_helper.put_student_by_id(student_id=get_student_id,
-                                                    json=generate_random_student.model_dump())
+                                                    json=generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.forbidden)

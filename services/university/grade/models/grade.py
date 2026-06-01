@@ -19,3 +19,16 @@ class GradeRequest(BaseModel):
 
 class GradeResponse(GradeRequest):
     id: int = Field(...)
+
+class GradeStatRequest(BaseModel):
+    student_id: int
+    teacher_id: int
+    group_id: int
+
+class GradeStatResponse(BaseModel):
+    count: int | None = Field(...)
+    min: int | None = Field(...)
+    max: int | None = Field(...)
+    avg: float | None = Field(...)
+
+

@@ -20,14 +20,10 @@ from services.university.teacher.helpers.teacher_helper import TeacherHelper
 from services.university.teacher.models.teacher_request import TeacherRequest
 from services.university.university_service import UniversityService
 from utils.api_utils import ApiUtils
-from faker import Faker
-from services.university.grade.models.grade import Grade
 from utils.assertions.soft_assert import SoftAssert
 
 from utils.factories.factory_random_data import FactoryRandomData
 from utils.logs.logger.logger import Logger
-
-faker = Faker()
 
 
 @pytest.fixture(scope="function", autouse=False)
@@ -111,20 +107,20 @@ def group_helper(university_api_utils_anonym):
 
 
 @pytest.fixture(scope="function", autouse=False)
-def access_token(auth_api_utils_anonym, generate_random_user, auth_service):
-    auth_service.register_user(register_request=generate_random_user)
+def access_token(auth_api_utils_anonym, auth_service):
+    user = generate_random_user()
+    auth_service.register_user(register_request=user)
     login_response = auth_service.login_user(login_request=
     LoginRequest(
-        username=generate_random_user.username,
-        password=generate_random_user.password))
+        username=user.username,
+        password=user.password))
     return login_response.access_token
 
 
-@pytest.fixture(scope="function", autouse=False)
-def generate_random_user(auth_api_utils_anonym):
-    username = faker.user_name()
+def generate_random_user():
+    username = FactoryRandomData().faker.user_name()
     password = FactoryRandomData.generate_random_password()
-    email = faker.email()
+    email = FactoryRandomData().faker.email()
     user_data = {
         "username": username,
         "password": password,
@@ -136,6 +132,7 @@ def generate_random_user(auth_api_utils_anonym):
     return RegisterRequest(**user_data)
 
 
+
 @pytest.fixture(scope="function", autouse=False)
 def get_user_by_token(auth_api_utils, access_token):
     auth_service = AuthorizationService(auth_api_utils)
@@ -144,73 +141,78 @@ def get_user_by_token(auth_api_utils, access_token):
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_user_id(generate_random_user, auth_api_utils_anonym, auth_service):
-    user_id = auth_service.register_user(generate_random_user).id
+def get_user_id(auth_api_utils_anonym, auth_service):
+    user = generate_random_user()
+    user_id = auth_service.register_user(user).id
     return user_id
 
 
-@pytest.fixture(scope="function", autouse=False)
-def generate_random_group(university_service):
-    group = GroupRequest(name=faker.bothify("???-##-#"))
-    Logger.info(f"Generated group: {group}")
-    return group
+def generate_random_group():
+        group = GroupRequest(name=FactoryRandomData().faker.bothify("???-##-#"))
+        Logger.info(f"Generated group: {group}")
+        return group
 
 
-@pytest.fixture(scope="function", autouse=False)
-def generate_random_student(university_service, get_group_id):
-    student = StudentRequest(first_name=faker.first_name(),
-                             last_name=faker.last_name(),
-                             email=faker.email(),
+def generate_random_student(group_id):
+    student = StudentRequest(first_name=FactoryRandomData().faker.first_name(),
+                             last_name=FactoryRandomData().faker.last_name(),
+                             email=FactoryRandomData().faker.email(),
                              degree=random.choice([option for option in DegreeEnum]),
-                             phone=faker.numerify("+7##########"), group_id=get_group_id)
+                             phone=FactoryRandomData().faker.numerify("+7##########"),
+                             group_id=group_id)
     Logger.info(f"Generated student: {student}")
     return student
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_student_id(university_api_utils_anonym, generate_random_student, university_service):
-    student_id = university_service.create_student(generate_random_student).id
+def get_student_id(university_api_utils_anonym, university_service, get_group_id):
+    student = generate_random_student(get_group_id)
+    student_id = university_service.create_student(student).id
     return student_id
 
 
-@pytest.fixture(scope="function", autouse=False)
-def generate_random_teacher(university_api_utils_anonym):
+def generate_random_teacher():
     teacher = {
-        "first_name": faker.first_name(),
-        "last_name": faker.last_name(),
+        "first_name": FactoryRandomData().faker.first_name(),
+        "last_name": FactoryRandomData().faker.last_name(),
         "subject": random.choice(list(Subjects))
     }
     Logger.info(f"Generated teacher: {teacher}")
     return TeacherRequest(**teacher)
 
 
-@pytest.fixture(scope="function", autouse=False)
-def generate_random_grade(university_api_utils_anonym, get_teacher_id, get_student_id):
+
+def generate_random_grade(teacher_id, student_id):
     grade = {
-        "teacher_id": get_teacher_id,
-        "student_id": get_student_id,
+        "teacher_id": teacher_id,
+        "student_id": student_id,
         "grade": FactoryRandomData.get_random_grade()
     }
     Logger.info(f"Generated grade: {grade}")
     return GradeRequest(**grade)
 
 
+
 @pytest.fixture(scope="function", autouse=False)
-def get_group_id(university_api_utils_anonym, generate_random_group, university_service):
-    group_id = university_service.create_group(generate_random_group).id
+def get_group_id(university_api_utils_anonym, university_service):
+    group = generate_random_group()
+    group_id = university_service.create_group(group).id
     return group_id
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_teacher_id(university_api_utils_anonym, generate_random_teacher, university_service):
-    teacher_id = university_service.create_teacher(generate_random_teacher).id
+def get_teacher_id(university_api_utils_anonym, university_service):
+    teacher = generate_random_teacher()
+    teacher_id = university_service.create_teacher(teacher).id
     return teacher_id
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_grade_id(university_api_utils_anonym, university_service, generate_random_grade):
-    grade_id = university_service.create_grade(generate_random_grade).id
+def get_grade_id(university_api_utils_anonym, university_service, get_teacher_id, get_student_id):
+    grade = generate_random_grade(teacher_id=get_teacher_id, student_id=get_student_id)
+    grade_id = university_service.create_grade(grade).id
     return grade_id
+
 
 @pytest.fixture(scope="function", autouse=False)
 def soft_assert():
