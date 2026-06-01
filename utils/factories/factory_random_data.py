@@ -2,11 +2,12 @@ from faker import Faker
 import jwt
 import datetime
 import random
-from services.university.grade.models.grade import Grade
 
 class FactoryRandomData:
     faker = Faker()
     ALLOWED_SPECIAL_CHARS = '!"#$%&\'()*+,-./:;<=>?@^_`{|}~[]'
+    MIN_GRADE = 0
+    MAX_GRADE = 5
 
     @staticmethod
     def generate_random_password():
@@ -30,4 +31,4 @@ class FactoryRandomData:
 
     @staticmethod
     def get_random_grade():
-        return random.choice(list(Grade)).value
+        return random.randrange(start=FactoryRandomData.MIN_GRADE, stop=FactoryRandomData.MAX_GRADE+1)
