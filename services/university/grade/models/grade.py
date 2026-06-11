@@ -8,7 +8,7 @@ class GradeRequest(BaseModel):
     grade: int = Field(...)
 
 
-class GradeResponse(GradeRequest):
+class GradeCreateResponse(GradeRequest):
     id: int = Field(...)
 
 class GradeStatRequest(BaseModel):
@@ -21,5 +21,12 @@ class GradeStatResponse(BaseModel):
     min: int | None = Field(...)
     max: int | None = Field(...)
     avg: float | None = Field(...)
+
+class GradeUpdateResponse(BaseModel):
+    teacher_id: int = Field(...)
+    student_id: int = Field(...)
+    grade: int = Field(...)
+    id: int = Field(...)
+
 
 

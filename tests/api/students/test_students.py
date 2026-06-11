@@ -34,8 +34,8 @@ class TestStudents:
         response = student_helper_fake_token.get_students()
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
-    def test_get_students_without_creds(self, student_api_utils_anonym):
-        student_helper = StudentHelper(api_utils=student_api_utils_anonym)
+    def test_get_students_without_creds(self, university_api_utils_anonym):
+        student_helper = StudentHelper(api_utils=university_api_utils_anonym)
         response = student_helper.get_students()
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
@@ -48,8 +48,8 @@ class TestStudents:
         response = student_helper_fake_token.post_student(generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
-    def test_create_student_without_creds(self, student_api_utils_anonym, get_group_id):
-        student_helper = StudentHelper(api_utils=student_api_utils_anonym)
+    def test_create_student_without_creds(self, university_api_utils_anonym, get_group_id):
+        student_helper = StudentHelper(api_utils=university_api_utils_anonym)
         response = student_helper.post_student(generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
@@ -88,8 +88,8 @@ class TestStudents:
         response = student_helper_fake_token.delete_student(get_student_id)
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
-    def test_delete_student_without_creds(self, student_api_utils_anonym, get_student_id):
-        student_helper = StudentHelper(api_utils=student_api_utils_anonym)
+    def test_delete_student_without_creds(self, university_api_utils_anonym, get_student_id):
+        student_helper = StudentHelper(api_utils=university_api_utils_anonym)
         response = student_helper.delete_student(get_student_id)
         Assertions.validate_response_status_code(response, requests.codes.forbidden or requests.codes.unauthorized)
 
@@ -101,8 +101,8 @@ class TestStudents:
         response = student_helper_fake_token.get_student_by_id(get_student_id)
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
-    def test_get_student_by_id_without_creds(self, student_api_utils_anonym, student_helper, get_student_id):
-        student_helper = StudentHelper(api_utils=student_api_utils_anonym)
+    def test_get_student_by_id_without_creds(self, university_api_utils_anonym, student_helper, get_student_id):
+        student_helper = StudentHelper(api_utils=university_api_utils_anonym)
         response = student_helper.get_student_by_id(get_student_id)
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
@@ -116,9 +116,9 @@ class TestStudents:
                                                                json=generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
-    def test_put_student_by_id_without_creds(self, student_api_utils_anonym, student_helper, get_student_id,
+    def test_put_student_by_id_without_creds(self, university_api_utils_anonym, student_helper, get_student_id,
                                              get_group_id):
-        student_helper = StudentHelper(api_utils=student_api_utils_anonym)
+        student_helper = StudentHelper(api_utils=university_api_utils_anonym)
         response = student_helper.put_student_by_id(student_id=get_student_id,
                                                     json=generate_random_student(get_group_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
