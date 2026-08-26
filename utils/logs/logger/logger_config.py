@@ -1,6 +1,6 @@
 import logging
-import os
 from pathlib import Path
+
 
 class LoggerConfig:
     PROJECT_ROOT = Path(__file__).resolve().parents[3]
