@@ -27,7 +27,7 @@ env.bak/
 Thumbs.db
 
 # --- Logs, reports & temp files ---
-logs/
+artifacts/
 *.log
 tmp/
 temp/
