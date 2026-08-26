@@ -20,7 +20,8 @@ class ParentSuit(StrEnum):
 
 class Epic(StrEnum):
     USER = "User Management"
-    GRADE = "Grades Managements"
+    GRADES = "Grades Managements"
+    GROUPS = "Groups Managements"
 
 
 class Feature(StrEnum):
@@ -35,29 +36,32 @@ class Feature(StrEnum):
 
     GET_STAT = "Get statistics"
 
+    CREATE_GROUP = "Create group"
+    DELETE_GROUP = "Delete group"
+    GET_GROUP = "Get group"
+    GET_GROUPS = "Get groups"
+    UPDATE_GROUP_PUT = "Upgrade (put) group by group_id"
+
 
 
 class Story(StrEnum):
+    CREATE_VALID = "Create with valid data"
+    CREATE_INVALID = "Create with invalid data"
+
+    GET_VALID = "Get valid data"
+    GET_INVALID = "Get invalid data"
+
+    UPDATE_PUT_VALID = "Update (put) valid data"
+    UPDATE_PUT_INVALID = "Update (put) invalid data"
+
+    DELETE_VALID = "Delete with valid data"
+    DELETE_INVALID = "Delete with invalid data"
+
     LOGIN_VALID = "Login user with valid data"
     LOGIN_INVALID = "Login user with invalid data"
 
     REGISTER_VALID = "Register user with valid data"
     REGISTER_INVALID = "Register user with invalid data"
-
-    CREATE_GRADE_VALID = "Create grade with valid data"
-    CREATE_GRADE_INVALID = "Create grade with invalid data"
-
-    GET_GRADES_VALID = "Get grade with valid data"
-    GET_GRADES_INVALID = "Get grade with invalid data"
-
-    DELETE_GRADE_VALID = "Delete grade with valid data"
-    DELETE_GRADE_INVALID = "Delete grade with invalid data"
-
-    PUT_GRADE_VALID = "Update grade (put) with valid data"
-    PUT_GRADE_INVALID = "Update grade (put) with invalid data"
-
-    GET_STAT = "Get stat"
-
 
 class Label(StrEnum):
     POSITIVE = "Positive"
