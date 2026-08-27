@@ -14,6 +14,7 @@ class SubSuit(StrEnum):
     TEACHERS = "Teachers"
     STUDENTS = "Students"
 
+
 class ParentSuit(StrEnum):
     API = "API Tests"
 
@@ -22,6 +23,8 @@ class Epic(StrEnum):
     USER = "User Management"
     GRADES = "Grades Managements"
     GROUPS = "Groups Managements"
+    STUDENTS = "Students Managements"
+    TEACHERS = "Teachers Managements"
 
 
 class Feature(StrEnum):
@@ -42,6 +45,17 @@ class Feature(StrEnum):
     GET_GROUPS = "Get groups"
     UPDATE_GROUP_PUT = "Upgrade (put) group by group_id"
 
+    CREATE_STUDENT = "Create student"
+    DELETE_STUDENT = "Delete student"
+    GET_STUDENT = "Get student"
+    GET_STUDENTS = "Get students"
+    UPDATE_PUT_STUDENT = "Update (put) student by student_id"
+
+    CREATE_TEACHER = "Create teacher"
+    DELETE_TEACHER = "Delete teacher"
+    GET_TEACHER = "Get teacher"
+    GET_TEACHERS = "Get teachers"
+    UPDATE_PUT_TEACHER = "Update (put) teacher by teacher_id"
 
 
 class Story(StrEnum):
@@ -62,6 +76,7 @@ class Story(StrEnum):
 
     REGISTER_VALID = "Register user with valid data"
     REGISTER_INVALID = "Register user with invalid data"
+
 
 class Label(StrEnum):
     POSITIVE = "Positive"
