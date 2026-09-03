@@ -1,7 +1,6 @@
 import requests.status_codes
 from allure_commons.types import Severity
 
-from conftest import generate_random_user
 from services.authorization.authorization_service import AuthorizationService
 from services.authorization.helpers.authorization_helper import AuthorizationHelper
 from services.authorization.models.login_request import LoginRequest
@@ -24,9 +23,9 @@ class TestLoginUser:
         description="Verify that response's status code is 200 ok",
         severity=Severity.BLOCKER
     )
-    def test_login_user_success(self, auth_api_utils_anonym, soft_assert):
+    def test_login_user_success(self, auth_api_utils_anonym, soft_assert, get_random_user):
         auth_helper = AuthorizationHelper(auth_api_utils_anonym)
-        user = generate_random_user()
+        user = get_random_user
         auth_helper.post_register(data=user.model_dump())
         response = auth_helper.post_login(user.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.ok)
@@ -43,8 +42,8 @@ class TestLoginUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_login_user_invalid_creds(self, auth_api_utils_anonym, soft_assert):
-        user = generate_random_user()
+    def test_login_user_invalid_creds(self, auth_api_utils_anonym, soft_assert, get_random_user):
+        user = get_random_user
         auth_service = AuthorizationService(auth_api_utils_anonym)
         response = auth_service.login_user(login_request=LoginRequest(
             username=user.username,

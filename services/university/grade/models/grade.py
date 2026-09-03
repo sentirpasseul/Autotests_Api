@@ -3,13 +3,13 @@ from enum import Enum
 
 
 class GradeRequest(BaseModel):
-    teacher_id: int = Field(...)
-    student_id: int = Field(...)
-    grade: int = Field(...)
+    teacher_id: int
+    student_id: int
+    grade: int  
 
 
 class GradeCreateResponse(GradeRequest):
-    id: int = Field(...)
+    id: int  
 
 class GradeStatRequest(BaseModel):
     student_id: int
@@ -17,16 +17,16 @@ class GradeStatRequest(BaseModel):
     group_id: int
 
 class GradeStatResponse(BaseModel):
-    count: int | None = Field(...)
-    min: int | None = Field(...)
-    max: int | None = Field(...)
-    avg: float | None = Field(...)
+    count: int | None  
+    min: int | None  
+    max: int | None  
+    avg: float | None  
 
 class GradeUpdateResponse(BaseModel):
-    teacher_id: int = Field(...)
-    student_id: int = Field(...)
-    grade: int = Field(...)
-    id: int = Field(...)
+    teacher_id: int  
+    student_id: int  
+    grade: int  
+    id: int  
 
 
 

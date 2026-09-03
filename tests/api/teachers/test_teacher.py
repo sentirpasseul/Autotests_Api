@@ -9,7 +9,6 @@ from services.university.group.models.subjects import Subjects
 from services.university.teacher.models.teacher_request import TeacherRequest
 from services.university.university_service import UniversityService
 from utils.assertions.general_assertions import Assertions
-from conftest import generate_random_teacher
 from utils.responses.user_responses import UserErrorsStrEnum
 from utils.logs.allure_conf.allure_data import ParentSuit, Suit, SubSuit, Story, Feature, Label, Epic
 from utils.logs.allure_conf.allure_config import allure_test_report
@@ -42,8 +41,8 @@ class TestTeacher:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_get_teachers_response_success(self, university_service, soft_assert):
-        created_teacher = university_service.create_teacher(generate_random_teacher())
+    def test_get_teachers_response_success(self, university_service, soft_assert, get_random_teacher):
+        created_teacher = university_service.create_teacher(get_random_teacher)
         response = university_service.get_teachers()
         soft_assert.check(len(response.root) > 0, f"No any teachers have found")
         soft_assert.check(created_teacher.id in [teacher.id for teacher in response])
@@ -76,8 +75,8 @@ class TestTeacher:
         severity=Severity.BLOCKER,
         label=Label.POSITIVE
     )
-    def test_create_teacher_status_code_success(self, university_api_utils, teacher_helper):
-        teacher = generate_random_teacher()
+    def test_create_teacher_status_code_success(self, university_api_utils, teacher_helper, get_random_teacher):
+        teacher = get_random_teacher
         response = teacher_helper.post_teacher(teacher.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.created)
 
@@ -92,8 +91,8 @@ class TestTeacher:
         severity=Severity.BLOCKER,
         label=Label.POSITIVE
     )
-    def test_create_teacher_response_success(self, university_service, soft_assert):
-        teacher = generate_random_teacher()
+    def test_create_teacher_response_success(self, university_service, soft_assert, get_random_teacher):
+        teacher = get_random_teacher
         response = university_service.create_teacher(teacher)
         soft_assert.check(teacher.first_name == response.first_name,
                           f"Teacher's firstname mismatch: got {response.first_name}, expected {teacher.first_name}")
@@ -114,9 +113,9 @@ class TestTeacher:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_teacher_without_token(self, university_api_utils_anonym):
+    def test_create_teacher_without_token(self, university_api_utils_anonym, get_random_teacher):
         university_service = UniversityService(university_api_utils_anonym)
-        response = university_service.create_teacher(generate_random_teacher())
+        response = university_service.create_teacher(get_random_teacher)
         Assertions.validate_message(response, UserErrorsStrEnum.ACCESS_DENIED)
 
     @allure_test_report(
@@ -180,8 +179,8 @@ class TestTeacher:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_put_teacher_by_id(self, teacher_helper, university_api_utils, get_teacher_id):
-        teacher = generate_random_teacher()
+    def test_put_teacher_by_id(self, teacher_helper, university_api_utils, get_teacher_id, get_random_teacher):
+        teacher = get_random_teacher
         response = teacher_helper.put_teacher_by_id(teacher_id=get_teacher_id,
                                                     json=teacher.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.ok)

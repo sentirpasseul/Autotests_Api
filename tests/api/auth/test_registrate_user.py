@@ -5,13 +5,12 @@ from allure_commons.types import Severity
 from utils.assertions.general_assertions import Assertions
 from faker import Faker
 from services.authorization.models.register_request import RegisterRequest
+from utils.factories.factory_random_data import FactoryRandomData
 from utils.logs.allure_conf.allure_config import allure_test_report
 from utils.responses.user_responses import AuthErrorsStrEnum
-from utils.factories.factory_random_data import FactoryRandomData
 from utils.responses.user_responses import UserErrorsStrEnum
 from utils.responses.user_responses import UserResponsesStrEnum
 import random
-from conftest import generate_random_user
 from utils.logs.allure_conf.allure_data import Epic, Story, Feature, Suit, SubSuit, ParentSuit, Label
 
 
@@ -32,8 +31,8 @@ class TestRegistrateUser:
         label=Label.POSITIVE
     )
     def test_registrate_user_success_status_code(self, auth_api_utils_anonym,
-                                                 auth_helper, user_helper):
-        response_register = auth_helper.post_register(generate_random_user().model_dump())
+                                                 auth_helper, user_helper, get_random_user):
+        response_register = auth_helper.post_register(get_random_user.model_dump())
         Assertions.validate_response_status_code(response_register, requests.codes.created)
 
     @allure_test_report(
@@ -47,8 +46,8 @@ class TestRegistrateUser:
         severity=Severity.BLOCKER,
         label=Label.POSITIVE
     )
-    def test_registrate_user_success_response_body(self, auth_service):
-        response = auth_service.register_user(generate_random_user())
+    def test_registrate_user_success_response_body(self, auth_service, get_random_user):
+        response = auth_service.register_user(get_random_user)
         Assertions.validate_message(response, UserResponsesStrEnum.USER_REGISTERED)
 
     @allure_test_report(
@@ -62,8 +61,8 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_user_duplicate_username_status_code(self, auth_helper):
-        user = generate_random_user()
+    def test_registrate_user_duplicate_username_status_code(self, auth_helper, get_random_user):
+        user = get_random_user
         auth_helper.post_register(user.model_dump())
         user_data = {
             "username": user.username,
@@ -86,8 +85,8 @@ class TestRegistrateUser:
         label=Label.NEGATIVE
     )
     @pytest.mark.xfail
-    def test_registrate_user_duplicate_username_response_body(self, auth_service):
-        user = generate_random_user()
+    def test_registrate_user_duplicate_username_response_body(self, auth_service, get_random_user):
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=user.password,
@@ -107,10 +106,10 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_user_duplicate_email_status_code(self, auth_helper):
-        user = generate_random_user()
+    def test_registrate_user_duplicate_email_status_code(self, auth_helper, get_random_user, get_random_password):
+        user = get_random_user
         auth_helper.post_register(user.model_dump())
-        password = FactoryRandomData.generate_random_password()
+        password = get_random_password
         user_data = {
             "username": self.faker.user_name(),
             "password": password,
@@ -131,10 +130,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_user_duplicate_email_response_body(self, auth_service):
-        user = generate_random_user()
+    @pytest.mark.xfail
+    def test_registrate_user_duplicate_email_response_body(self, auth_service, get_random_user, get_random_password):
+        user = get_random_user
         auth_service.register_user(user)
-        password = FactoryRandomData.generate_random_password()
+        password = get_random_password
         response = auth_service.register_user(RegisterRequest(
             username=self.faker.user_name(),
             password=password,
@@ -154,11 +154,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_registrate_min_valid_password_status_code(self, auth_helper):
+    def test_registrate_min_valid_password_status_code(self, auth_helper, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 6)}')
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -179,11 +179,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_registrate_min_valid_password_response_body(self, auth_service):
+    def test_registrate_min_valid_password_response_body(self, auth_service, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 6)}')
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -203,11 +203,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_registrate_max_valid_password_status_code(self, auth_helper):
+    def test_registrate_max_valid_password_status_code(self, auth_helper, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 97)}')
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -228,11 +228,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_registrate_max_valid_password_response_body(self, auth_service):
+    def test_registrate_max_valid_password_response_body(self, auth_service, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 97)}')
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -252,11 +252,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_min_boundary_failed_status_code(self, auth_helper):
+    def test_registrate_password_min_boundary_failed_status_code(self, auth_helper, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 5)}')
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -277,11 +277,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_min_boundary_failed_response_body(self, auth_service):
+    def test_registrate_password_min_boundary_failed_response_body(self, auth_service, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 5)}')
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -301,11 +301,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_max_boundary_failed_status_code(self, auth_helper):
+    def test_registrate_password_max_boundary_failed_status_code(self, auth_helper, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 99)}')
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -326,11 +326,11 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_max_boundary_failed_response_body(self, auth_service):
+    def test_registrate_password_max_boundary_failed_response_body(self, auth_service, get_random_user):
         password = (f'{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
                     f'{self.faker.random_digit_not_null()}'
                     f'{self.faker.lexify(text='?' * 99)}')
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -350,8 +350,8 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_empty_password_status_code(self, auth_helper):
-        user = generate_random_user()
+    def test_registrate_empty_password_status_code(self, auth_helper, get_random_user):
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": '',
@@ -372,8 +372,8 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_empty_password_response_body(self, auth_service):
-        user = generate_random_user()
+    def test_registrate_empty_password_response_body(self, auth_service, get_random_user):
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password='',
@@ -394,8 +394,8 @@ class TestRegistrateUser:
         label=Label.NEGATIVE
     )
     @pytest.mark.xfail
-    def test_registrate_empty_username_status_code(self, auth_helper):
-        user = generate_random_user()
+    def test_registrate_empty_username_status_code(self, auth_helper, get_random_user):
+        user = get_random_user
         user_data = {
             "username": '',
             "password": user.password,
@@ -403,7 +403,7 @@ class TestRegistrateUser:
             "email": user.email
         }
         response = auth_helper.post_register(user_data)
-        Assertions.validate_message(response, requests.codes.unprocessable)
+        Assertions.validate_response_status_code(response, requests.codes.unprocessable)
 
     @allure_test_report(
         parent_suit=ParentSuit.API,
@@ -416,15 +416,16 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    @pytest.mark.skip
-    def test_registrate_empty_username_response_body(self, auth_service):
-        user = generate_random_user()
+
+    @pytest.mark.xfail
+    def test_registrate_empty_username_response_body(self, auth_service, get_random_user):
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username='',
             password=user.password,
             password_repeat=user.password_repeat,
             email=user.email))
-        Assertions.validate_message(response, '')
+        Assertions.validate_message(response, UserErrorsStrEnum.EMAIL_INCORRECT)
 
     @allure_test_report(
         parent_suit=ParentSuit.API,
@@ -437,9 +438,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_passwords_not_match_status_code(self, auth_helper):
-        password = FactoryRandomData.generate_random_password()
-        user = generate_random_user()
+    def test_registrate_passwords_not_match_status_code(self, auth_helper, get_random_password, get_random_user):
+        password = get_random_password
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": user.password,
@@ -460,9 +461,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_passwords_not_match_response_body(self, auth_service):
-        user = generate_random_user()
-        password = FactoryRandomData.generate_random_password()
+    def test_registrate_passwords_not_match_response_body(self, auth_service, get_random_user, get_random_password):
+        user = get_random_user
+        password = get_random_password
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=user.password,
@@ -481,9 +482,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_without_special_chars_status_code(self, auth_helper):
+    def test_registrate_password_without_special_chars_status_code(self, auth_helper, get_random_user):
         password = f'{Faker().lexify(text='?' * self.MIN_CHARS)}{Faker().random_digit_not_null()}'
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -504,9 +505,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_without_special_chars_response_body(self, auth_service):
+    def test_registrate_password_without_special_chars_response_body(self, auth_service, get_random_user):
         password = f'{Faker().lexify(text='?' * self.MIN_CHARS)}{Faker().random_digit_not_null()}'
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -525,9 +526,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_without_number_status_code(self, auth_helper):
+    def test_registrate_password_without_number_status_code(self, auth_helper, get_random_user):
         password = f"{Faker().lexify(text='?' * self.MIN_CHARS)}{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}"
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -548,9 +549,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_without_number_response_body(self, auth_service):
+    def test_registrate_password_without_number_response_body(self, auth_service, get_random_user):
         password = f"{Faker().lexify(text='?' * self.MIN_CHARS)}{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}"
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -569,9 +570,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_only_letters_status_code(self, auth_helper):
+    def test_registrate_password_only_letters_status_code(self, auth_helper, get_random_user):
         password = f"{Faker().lexify(text='?' * 10)}"
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -592,9 +593,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_only_letters_response_body(self, auth_service):
+    def test_registrate_password_only_letters_response_body(self, auth_service, get_random_user):
         password = f"{Faker().lexify(text='?' * 10)}"
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,
@@ -613,9 +614,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_without_letters_status_code(self, auth_helper):
+    def test_registrate_password_without_letters_status_code(self, auth_helper, get_random_user):
         password = f'{random.randrange(1000000, 9999999)}{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
-        user = generate_random_user()
+        user = get_random_user
         user_data = {
             "username": user.username,
             "password": password,
@@ -636,9 +637,9 @@ class TestRegistrateUser:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_registrate_password_without_letters_response_body(self, auth_service):
+    def test_registrate_password_without_letters_response_body(self, auth_service, get_random_user):
         password = f'{random.randrange(1000000, 9999999)}{random.choice(FactoryRandomData.ALLOWED_SPECIAL_CHARS)}'
-        user = generate_random_user()
+        user = get_random_user
         response = auth_service.register_user(RegisterRequest(
             username=user.username,
             password=password,

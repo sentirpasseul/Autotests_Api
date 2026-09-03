@@ -4,7 +4,6 @@ from allure_commons.types import Severity
 from services.university.group.helpers.group_helper import GroupHelper
 from services.university.university_service import UniversityService
 from utils.assertions.general_assertions import Assertions
-from conftest import generate_random_group
 from utils.responses.group_responses import GroupErrorResponses, GroupResponses
 from utils.responses.user_responses import UserErrorsStrEnum
 from utils.logs.allure_conf.allure_data import ParentSuit, Suit, SubSuit, Story, Feature, Label, Epic
@@ -23,8 +22,8 @@ class TestGroups:
         severity=Severity.BLOCKER,
         label=Label.POSITIVE
     )
-    def test_create_group_status_code(self, group_helper):
-        response = group_helper.post_group(generate_random_group().model_dump())
+    def test_create_group_status_code(self, group_helper, get_random_group):
+        response = group_helper.post_group(get_random_group.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.created)
 
     @allure_test_report(
@@ -38,11 +37,12 @@ class TestGroups:
         severity=Severity.BLOCKER,
         label=Label.POSITIVE
     )
-    def test_create_group_response(self, university_service, soft_assert):
-        group = generate_random_group()
+    def test_create_group_response(self, university_service, soft_assert, get_random_group):
+        group = get_random_group
         response = university_service.create_group(group)
         soft_assert.check(response.name == group.name,
                           f'Group name mismatch: got {response.name}, expected {group.name}')
+
         soft_assert.assert_all()
 
     @allure_test_report(
@@ -56,8 +56,8 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_existed_group_status_code(self, group_helper):
-        group = generate_random_group()
+    def test_create_existed_group_status_code(self, group_helper, get_random_group):
+        group = get_random_group
         group_helper.post_group(group.model_dump())
         response = group_helper.post_group(group.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.conflict)
@@ -73,8 +73,8 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_existed_group_response(self, university_service):
-        group = generate_random_group()
+    def test_create_existed_group_response(self, university_service, get_random_group):
+        group = get_random_group
         university_service.create_group(group)
         response = university_service.create_group(group)
         Assertions.validate_message(response, GroupErrorResponses.GROUP_IS_TAKEN)
@@ -90,9 +90,9 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_group_without_creds_status_code(self, university_api_utils_anonym):
+    def test_create_group_without_creds_status_code(self, university_api_utils_anonym, get_random_group):
         group_helper = GroupHelper(university_api_utils_anonym)
-        group = generate_random_group()
+        group = get_random_group
         response = group_helper.post_group(group.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.forbidden)
 
@@ -107,9 +107,9 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_group_without_creds_response(self, university_api_utils_anonym):
+    def test_create_group_without_creds_response(self, university_api_utils_anonym, get_random_group):
         university_service = UniversityService(university_api_utils_anonym)
-        group = generate_random_group()
+        group = get_random_group
         response = university_service.create_group(group)
         Assertions.validate_message(response, UserErrorsStrEnum.ACCESS_DENIED)
 
@@ -124,9 +124,9 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_group_with_fake_token_status_code(self, university_api_utils_fake_token):
+    def test_create_group_with_fake_token_status_code(self, university_api_utils_fake_token, get_random_group):
         group_helper = GroupHelper(university_api_utils_fake_token)
-        group = generate_random_group()
+        group = get_random_group
         response = group_helper.post_group(group.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.unauthorized)
 
@@ -141,9 +141,9 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.NEGATIVE
     )
-    def test_create_group_with_fake_token_response(self, university_api_utils_fake_token):
+    def test_create_group_with_fake_token_response(self, university_api_utils_fake_token, get_random_group):
         university_service = UniversityService(university_api_utils_fake_token)
-        group = generate_random_group()
+        group = get_random_group
         response = university_service.create_group(group)
         Assertions.validate_message(response, UserErrorsStrEnum.INVALID_JWT_TOKEN)
 
@@ -316,7 +316,7 @@ class TestGroups:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_put_group_by_id(self, group_helper, university_api_utils, get_group_id):
+    def test_put_group_by_id(self, group_helper, university_api_utils, get_group_id, get_random_group):
         response = group_helper.put_group_by_id(group_id=get_group_id,
-                                                json=generate_random_group().model_dump())
+                                                json=get_random_group.model_dump())
         Assertions.validate_response_status_code(response, requests.codes.ok)

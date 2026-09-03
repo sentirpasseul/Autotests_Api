@@ -13,5 +13,5 @@ class AuthorizationHelper(BaseHelper):
         return response
 
     def post_login(self, data: dict) -> requests.Response:
-        response = self.api_utils.post(self.ENDPOINT_PREFIX + self.LOGIN_ENDPOINT, data)
+        response = self.api_utils.post(self.ENDPOINT_PREFIX + self.LOGIN_ENDPOINT, data=data)
         return response

@@ -1,10 +1,8 @@
 import requests
 from allure_commons.types import Severity
 
-from conftest import generate_random_grade
 from services.university.grade.models.grade import GradeRequest
 from utils.assertions.general_assertions import Assertions
-from utils.factories.factory_random_data import FactoryRandomData
 from utils.responses.grade_responses import GradeResponse, GradeErrorResponses
 from utils.logs.allure_conf.allure_data import ParentSuit, Suit, SubSuit, Story, Epic, Feature, Label
 from utils.logs.allure_conf.allure_config import allure_test_report
@@ -23,11 +21,11 @@ class TestGrade:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_create_grade_status_code(self, grade_helper, get_student_id, get_teacher_id):
+    def test_create_grade_status_code(self, grade_helper, get_student_id, get_teacher_id, get_random_grade_int):
         response = grade_helper.post_grade(data={
             "teacher_id": get_teacher_id,
             "student_id": get_student_id,
-            "grade": FactoryRandomData().get_random_grade()
+            "grade": get_random_grade_int
         })
         Assertions.validate_response_status_code(response, requests.codes.created)
 
@@ -43,8 +41,8 @@ class TestGrade:
         label=Label.POSITIVE
     )
     def test_create_grade_check_response(self, university_service, soft_assert,
-                                         get_group_id, get_teacher_id, get_student_id):
-        grade = FactoryRandomData.get_random_grade()
+                                         get_group_id, get_teacher_id, get_student_id, get_random_grade_int):
+        grade = get_random_grade_int
         response = university_service.create_grade(GradeRequest(teacher_id=get_teacher_id,
                                                                 student_id=get_student_id,
                                                                 grade=grade))
@@ -163,10 +161,11 @@ class TestGrade:
         severity=Severity.CRITICAL,
         label=Label.POSITIVE
     )
-    def test_put_grade_by_id_status_code(self, grade_helper, get_grade_id, get_teacher_id, get_student_id):
+    def test_put_grade_by_id_status_code(self, grade_helper, get_grade_id, get_teacher_id, get_student_id,
+                                         get_random_grade):
         response = grade_helper.put_grade_by_id(grade_id=get_grade_id,
-                                                data=generate_random_grade(student_id=get_student_id,
-                                                                           teacher_id=get_teacher_id).model_dump())
+                                                data=get_random_grade(student_id=get_student_id,
+                                                                          teacher_id=get_teacher_id).model_dump())
         Assertions.validate_response_status_code(response, requests.codes.ok)
 
     @allure_test_report(
@@ -181,8 +180,8 @@ class TestGrade:
         label=Label.POSITIVE
     )
     def test_put_grade_by_id_response(self, university_service, grade_helper, get_grade_id, get_teacher_id,
-                                      get_student_id, soft_assert):
-        grade = FactoryRandomData.get_random_grade()
+                                      get_student_id, soft_assert, get_random_grade_int):
+        grade = get_random_grade_int
         response = university_service.put_grade_by_id(grade_id=get_grade_id,
                                                       grade_request=GradeRequest(
                                                           student_id=get_student_id,
@@ -214,5 +213,3 @@ class TestGrade:
             "student_id": get_student_id,
             "teacher_id": get_teacher_id})
         Assertions.validate_response_status_code(response, requests.codes.ok)
-
-
