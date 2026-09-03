@@ -11,14 +11,13 @@ execnet==2.1.2
 Faker==40.11.0
 idna==3.11
 iniconfig==2.3.0
-jwt==1.4.0
 packaging==26.0
 pluggy==1.6.0
 pycparser==3.0
 pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
-PyJWT==2.12.1
+PyJWT==2.13.0
 pytest==9.0.2
 pytest-xdist==3.8.0
 requests==2.32.5

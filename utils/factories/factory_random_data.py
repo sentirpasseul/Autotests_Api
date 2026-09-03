@@ -1,8 +1,9 @@
 from faker import Faker
 import jwt
-import datetime
+from datetime import datetime, timedelta, timezone
 import random
 import uuid
+import secrets
 
 from services.authorization.models.register_request import RegisterRequest
 from services.university.grade.models.grade import GradeRequest
@@ -14,22 +15,28 @@ from services.university.teacher.models.teacher_request import TeacherRequest
 from utils.logs.logger.logger import Logger
 
 
-
 class FactoryRandomData:
     faker = Faker()
     ALLOWED_SPECIAL_CHARS = '!"#$%&\'()*+,-./:;<=>?@^_`{|}~[]'
     MIN_GRADE = 0
     MAX_GRADE = 5
+    LENGTH_PASSWORD = 30
+    HOURS_DELTA = 1
+    __LENGTH_SECRET_KEY = 32
 
     @staticmethod
-    def generate_hash():
+    def __generate_hash():
         return uuid.uuid4().hex[:8]
 
     @staticmethod
     def generate_unique_username_with_hash():
         username = FactoryRandomData.faker.unique.user_name()
-        suffix = FactoryRandomData.generate_hash()
+        suffix = FactoryRandomData.__generate_hash()
         return f"{username}_{suffix}"
+
+    @staticmethod
+    def __generate_secret_key():
+        return secrets.token_hex(FactoryRandomData.__LENGTH_SECRET_KEY)
 
     @staticmethod
     def generate_unique_email_with_hash():
@@ -38,7 +45,7 @@ class FactoryRandomData:
 
     @staticmethod
     def generate_random_password():
-        password = FactoryRandomData.faker.password(length=30,
+        password = FactoryRandomData.faker.password(length=FactoryRandomData.LENGTH_PASSWORD,
                                                     special_chars=True,
                                                     digits=True,
                                                     upper_case=True,
@@ -47,19 +54,19 @@ class FactoryRandomData:
 
     @staticmethod
     def generate_jwt_token():
+        now = datetime.now(timezone.utc)
         payload = {
             "sub": FactoryRandomData.faker.uuid4(),
-            "name": FactoryRandomData.faker.name(),
-            "email": FactoryRandomData.faker.email(),
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            "name": FactoryRandomData.generate_unique_username_with_hash(),
+            "email": FactoryRandomData.generate_unique_email_with_hash(),
+            "iat": now,
+            "exp": now + timedelta(hours=FactoryRandomData.HOURS_DELTA)
         }
-        secret = "test_secret"
-        return jwt.encode(payload, secret, algorithm="HS256")
+        return jwt.encode(payload, FactoryRandomData.__generate_secret_key(), algorithm="HS256")
 
     @staticmethod
     def get_random_grade():
-        return random.randrange(start=FactoryRandomData.MIN_GRADE, stop=FactoryRandomData.MAX_GRADE+1)
-
+        return random.randrange(start=FactoryRandomData.MIN_GRADE, stop=FactoryRandomData.MAX_GRADE + 1)
 
     @staticmethod
     def generate_random_user():
