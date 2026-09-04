@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: autotests-run
+  namespace: autotests
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: tests
+              image: ghcr.io/<user>/autotests-api:latest
+              volumeMounts:
+                - name: results
+                  mountPath: /app/artifacts/allure-results
+          restartPolicy: Never
+          volumes:
+            - name: results
+              persistentVolumeClaim:
+                claimName: allure-results

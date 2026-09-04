@@ -1,14 +1,20 @@
 services:
-  app:
-    image: autotests-api:latest
-    container-name: autotests-api
-    ports:
-      - "8080:8081"
-    environment:
-
-    build: .    
-  
   tests:
     build: .
     volumes:
-      -  ./artifcts/allure-results:/app/allure-reports
+      - allure-results:/app/artifacts/allure-results
+
+  allure:
+    image: frankescobar/allure-docker-service
+    depends_on:
+      - tests
+    environment:
+      CHECK_RESULTS_EVERY_SECOND: 5
+      KEEP_HISTORY: "true"
+    volumes:
+      - allure-results:/app/allure-results
+    ports:
+      - "5050:5050"
+
+volumes:
+  allure-results:

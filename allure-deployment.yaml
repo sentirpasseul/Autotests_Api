@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allure
+  namespace: autotests
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: allure }
+  template:
+    metadata:
+      labels: { app: allure }
+    spec:
+      containers:
+        - name: allure
+          image: frankescobar/allure-docker-service
+          ports: [{ containerPort: 5050 }]
+          volumeMounts:
+            - name: results
+              mountPath: /app/allure-results
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: allure-results
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: allure-svc
+  namespace: autotests
+spec:
+  selector: { app: allure }
+  ports:
+    - port: 80
+      targetPort: 5050
+  type: ClusterIP
