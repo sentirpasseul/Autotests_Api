@@ -1,0 +1,79 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# --- Virtual Environments ---
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+*.env
+
+# --- IDE (PyCharm, JetBrains) ---
+.idea/
+*.iml
+
+# --- OS-specific files ---
+.DS_Store
+Thumbs.db
+
+# --- Logs, reports & temp files ---
+artifacts/
+*.log
+tmp/
+temp/
+*.tmp
+
+# --- PyTest ---
+.cache/
+.pytest_cache/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+
+# --- Allure reports ---
+allure-results/
+allure-report/
+
+# --- Selenium-related (screenshots, downloads, etc.) ---
+screenshots/
+reports/
+downloads/
+output/
+browser_logs/
+test_videos/
+
+# --- MyPy / Type checkers ---
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# --- Jupyter / experiments ---
+.ipynb_checkpoints/
+
+# --- Local configs ---
+*.local
+*.json
+#*.yaml
+#*.yml
+
+
+# --- VSCode / Other editors ---
+.vscode/
+
+# --- OS garbage ---
+ehthumbs.db
+Desktop.ini
+
+# --- Others ---
+__pypackages__/
