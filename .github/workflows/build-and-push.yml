@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build-and-push:
@@ -22,9 +22,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata for Docker
+        id: meta
+        uses: actions/docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: |
+            lower=true
+          tags: |
+            type=raw,value=latest
+
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/autotests-api:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

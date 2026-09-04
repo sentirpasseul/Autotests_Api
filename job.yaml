@@ -15,7 +15,7 @@ spec:
         spec:
           containers:
             - name: tests
-              image: ghcr.io/<user>/autotests-api:latest
+              image: ghcr.io/sentirpasseul/autotests-api:latest
               volumeMounts:
                 - name: results
                   mountPath: /app/artifacts/allure-results
