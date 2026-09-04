@@ -1,5 +1,3 @@
-import random
-
 import pytest
 
 from services.authorization.authorization_service import AuthorizationService
@@ -8,21 +6,14 @@ from services.authorization.models.login_request import LoginRequest
 from services.authorization.user.helpers.user_helper import UserHelper
 from services.authorization.user.models.user import UserResponse
 from services.university.grade.helpers.grade_helper import GradeHelper
-from services.university.grade.models.grade import GradeRequest
 from services.university.group.helpers.group_helper import GroupHelper
-from services.university.group.models.group_request import GroupRequest
-from services.university.group.models.subjects import Subjects
 from services.university.student.helpers.student_helper import StudentHelper
-from services.university.student.models.student import DegreeEnum
-from services.university.student.models.student_request import StudentRequest
 from services.university.teacher.helpers.teacher_helper import TeacherHelper
-from services.university.teacher.models.teacher_request import TeacherRequest
 from services.university.university_service import UniversityService
 from utils.api_utils import ApiUtils
 from utils.assertions.soft_assert import SoftAssert
 
 from utils.factories.factory_random_data import FactoryRandomData
-from utils.logs.logger.logger import Logger
 
 
 @pytest.fixture(scope="function", autouse=False)
@@ -144,6 +135,7 @@ def get_random_group():
 def get_random_student():
     def _make(group_id: int):
         return FactoryRandomData.generate_random_student(group_id)
+
     return _make
 
 
@@ -156,11 +148,14 @@ def get_random_teacher():
 def get_random_grade_int():
     return FactoryRandomData.get_random_grade()
 
+
 @pytest.fixture(scope="function", autouse=False)
 def get_random_grade():
     def _make(teacher_id: int, student_id: int):
         return FactoryRandomData.generate_random_grade(teacher_id=teacher_id, student_id=student_id)
+
     return _make
+
 
 @pytest.fixture(scope="function", autouse=False)
 def get_random_password():
