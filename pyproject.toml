@@ -1,0 +1,29 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort (сортировка импортов)
+    "C90", # mccabe (сложность кода)
+    "UP",  # pyupgrade (современный синтаксис Python)
+    "ASYNC", # flake8-async (проверки для asyncio/httpx/playwright)
+    "PT",  # flake8-pytest-style (best practices для Pytest)
+    "B",   # flake8-bugbear (потенциальные баги)
+]
+ignore = [
+    "PT004", # фикстуры без return
+]
+
+[tool.ruff.lint.pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
